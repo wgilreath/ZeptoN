@@ -1,0 +1,42 @@
+.\" Manpage for zepc.
+.\" Contact William Gilreath (wfgilreath@yahoo.com) to correct errors or typos.
+.TH zepc 1 "13 August 2019" "1.0" "zepc man page"
+.SH NAME
+zepc \- ZEPC compiler
+.SH SYNOPSIS
+zepc (option)* [ -javac (javac-options)+ ] (zep-file)+ | ( -help | -info )   
+.SH DESCRIPTION
+zepc is high level shell script to launch the ZEPC compiler. 
+
+ZepC - ZeptoN Echo Transcompiler
+(C) Copyright 2019 William F. Gilreath. All Rights Reserved. Version 1.0 Released August 2019
+License is GNU General Public License (GPL) version 3.0.  
+.SH OPTIONS
+
+ZEPC OPTIONS:                                                          
+                                                                          
+  Compiler Options:  [ -echo ] | [ -final ] | [ -time ]       
+                                                                          
+    -echo        Print Zepc compiler options and success or failure.      
+    -final       Compile final release without debug information.         
+    -time        Print total time for success compiling of a source file. 
+                                                                          
+  Error Reporting Option: [ -hush | -mute | -brief ]                      
+
+    -brief       Print only a brief count of compiler messages.
+    -hush        Disable all compiler messages except errors.             
+    -mute        Disable all compiler messages.                           
+                                                                          
+  Help or Version Option:  ( -help | -? ) | ( -info | -v )                
+                                                                          
+    -help        Print list of compiler options and exit.                 
+    -info        Print compiler version information and exit.             
+                                                                          
+  Note: All options for -javac are passed as-is to the compiler.          
+                                                                        
+.SH SEE ALSO
+java(1), javac(1) 
+.SH BUGS
+No known bugs...yet!
+.SH AUTHOR
+William F. Gilreath (wfgilreath@yahoo.com)
