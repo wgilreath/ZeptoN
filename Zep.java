@@ -20,6 +20,7 @@
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -109,10 +110,11 @@ public final class Zep {
         "private final static void init(final String[] args){argv=args;}"+
         "private final static void deinit(){try{out_str.flush();out_str.close();err_str.flush();err_str.close();inp_str.close();}catch (Exception ex){err_str.println(ex.getMessage());ex.printStackTrace(err_str);}}"+
      
+        "private final static void gc(){run.gc();}"+
+
         "private final static String readLine(final String fmt, final Object... args){if(con==null){return EMPTY_STRING;} return con.readLine(fmt,args);} "+
         "private final static char[] readPassword(String fmt,Object... args){if (con==null){return EMPTY_CHAR;} return con.readPassword(fmt,args);} "+
         "private final static char[] readPassword(){if(con==null){return EMPTY_CHAR;} return con.readPassword();} "+
-        "private final static void gc(){run.gc();}"+
         "private final static BigDecimal readBigDecimal(){return scan.nextBigDecimal();}"+
         "private final static BigInteger readBigIntegr(){return scan.nextBigInteger();}"+
         "private final static byte readByte(){return scan.nextByte();}"+
@@ -122,6 +124,10 @@ public final class Zep {
         "private final static double readDouble(){return scan.nextDouble();}"+
         "private final static float readFloat(){return scan.nextFloat();}"+
         "private final static String readString(){try{return scan.next();}catch (Exception ex){err_str.println(ex.getMessage());ex.printStackTrace(err_str);} return EMPTY_STRING;} "+
+        "private final static boolean readBoolean(){return scan.nextBoolean();}"+
+        "private final static char readChar(){char chr;try{chr = (char) inp_str.read();}catch (Exception ex){chr = NULL_CHAR;} return chr;}"+
+        "private final static String readLine(){String line = EMPTY_STRING;try{line = scan.nextLine();}catch (Exception ex){line = EMPTY_STRING;} return line;}"+
+        
         "private final static void printf(final String fmt,final Object... param){out_str.printf(fmt,param);} "+
         "private final static void print(final char[] param){out_str.print(param);}"+
         "private final static void print(final BigDecimal param){out_str.print(param.toPlainString());}"+
@@ -151,21 +157,22 @@ public final class Zep {
         "private final static void println(final Object param){out_str.println(param);}"+
         "private final static void println(final short param){out_str.println(param);}"+
         "private final static void println(final String param){out_str.println(param);}"+
+        
+        
         "private final static void exit(final int code){run.exit(code);}"+
         "private final static long freeMemory(){return run.freeMemory();}"+
         "private final static long maxMemory(){return run.maxMemory();}"+
         "private final static long totalMemory(){return run.totalMemory();}"+
         "private final static long currentTimeMillis(){return System.currentTimeMillis();}"+
         "private final static long nanoTime(){return System.nanoTime();}"+
-        "private final static boolean readBoolean(){return scan.nextBoolean();}"+
-        "private final static char readChar(){char chr;try{chr = (char) inp_str.read();}catch (Exception ex){chr = NULL_CHAR;} return chr;}"+
-        "private final static String readLine(){String line = EMPTY_STRING;try{line = scan.nextLine();}catch (Exception ex){line = EMPTY_STRING;} return line;}"+
         "private final static Locale getLocale(){return scan.locale();}"+
         "private final static void arraycopy(final Object src,final int srcPos,Object dst,final int dstPost,final int len){System.arraycopy(src,srcPos,dst,dstPost,len);} "+
         "private final static String getenv(final String param){return System.getenv(param);}"+
         "private final static int identityHashCode(final Object obj){return System.identityHashCode(obj);}"+
         "private final static String getProperty(final String param){return System.getProperty(param);}"+
         "private final static Runtime getRuntime(){return run;}"+
+        "private final static String valueOf(final char[] param){return String.valueOf(param);}"+
+        "private final static Console console(){return con;}"+  
         "private final static String toString(final boolean[] param){return Arrays.toString(param);}"+
         "private final static String toString(final byte[] param){return Arrays.toString(param);}"+
         "private final static String toString(final char[] param){return Arrays.toString(param);}"+
@@ -175,11 +182,11 @@ public final class Zep {
         "private final static String toString(final long[] param){return Arrays.toString(param);}"+
         "private final static String toString(final short[] param){return Arrays.toString(param);}"+
         "private final static String toString(final Object[] param){return Arrays.toString(param);}"+
-        "private final static String valueOf(final char[] param){return String.valueOf(param);}"+
-        "private final static Console console(){return con;}"+  
+        
         "private final static String[] getArgs(){return argv;}"+ 
         "private final static void errorf(final String fmt,final Object...param){err_str.printf(fmt,param);}"+
         "private final static void nop(){;}"+
+                 
         " ";
 
     private static boolean briefFlag = false;  //set brief error reporting a count of error diagnostics
@@ -589,7 +596,7 @@ public final class Zep {
         comp.configureParams();
 
         for (String sourceFile : files) {
-            comp.compileZeptoN(transpile(sourceFile), sourceFile);
+            comp.compileZeptoN( transpile(sourceFile), sourceFile );
         }//end for
 
     }//end compile
@@ -636,6 +643,65 @@ public final class Zep {
     }//end verifyFile
 
     /**
+     * Pad the multiple line comments with whitespace but preserve \n and \r to maintain line number
+     *
+     * @param code - raw ZeptoN source code with comments.
+     */
+    private static String padCommentStar(final String code) {
+
+        StringBuilder text = new StringBuilder(code);
+        int head = 0;
+        int tail = -1;
+        for (;;) {
+
+            head = code.indexOf("/*", head);
+
+            tail = code.indexOf("*/", head + 2);
+
+            //System.out.printf("padCommentStar() head:%d tail%d%n", head, tail);
+
+            if (head == -1) {
+                break;
+            }//end if
+            
+            for (int idx = head; idx < tail + 2; idx++) {
+
+                char chr = code.charAt(idx);
+                if (!Character.isWhitespace(chr)) {
+                    text.replace(idx, idx + 1, " ");
+                }//end if
+
+            }//end for idx
+
+            head = tail + 2;
+
+        }//end for ;;
+
+        //System.out.printf("padCommentStart()--->%n%s%n<---%n", code);
+
+        return text.toString();
+    }//end padCommentStar
+
+    /**
+     * Process the comments in the ZeptoN source code but preserve line structure for error reporting.
+     *
+     * @param code - raw commented ZeptoN source code.
+     */
+
+    private static String processComments(final String code){
+
+        String result = padCommentStar(code);
+        
+        //result = result.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "");
+
+        result = result.replaceAll("//.*(?=\\n)", Zep.EMPTY_STRING); //remove single line comments
+        
+        return result;
+            
+    }//end processComments
+    
+    
+    /**
      * Transcompile single ZeptoN source code file into Java source code for compilation
      *
      * @param  fileName                  - name of the external file containing the ZeptoN source code.
@@ -651,10 +717,11 @@ public final class Zep {
         JavaSourceCodeStringObject javaObject = null;
 
         try {
-            String zepSource = new String(Files.readAllBytes(Paths.get(fileName)), Zep.CHARSET);
 
-            //check for 'prog'
-            //check for 'begin' ??
+        	String zepSource = new String(Files.readAllBytes(Paths.get(fileName)), Zep.CHARSET);
+            
+
+            zepSource = processComments(zepSource);
             
             zepSource = zepSource.replaceAll("\\{", " {");
             
@@ -674,13 +741,13 @@ public final class Zep {
             }//end if
 
             int progIdent = javaSource.indexOf("prog");
+                        
             int openBrace = javaSource.indexOf("{");
-
+            
             programName = javaSource.substring(progIdent + 5, openBrace - 1);
             programName = programName.trim();
             
-            javaSource.insert(progIdent, Zep.HEAD);
-
+            javaSource.insert(progIdent, Zep.HEAD); 
 
             int tailBrace = javaSource.lastIndexOf("}");
             javaSource.replace(tailBrace, tailBrace+1, "}catch(Exception _$ex){ System.out.printf(\"Uncaught ZeptoN Program Exception: '%s' is '%s'.%n\", _$ex.getClass().getName(), _$ex.getMessage()); }finally{ deinit(); System.exit(0);}  } }");
@@ -728,7 +795,7 @@ public final class Zep {
     private final static String ERROR_OPT_MUTE  = "Option -mute ambiguous with -brief and/or -hush option.";
 
     private final static String LICENSE = "License is GNU General Public License (GPL) version 3.0";
-    private final static String VERSION = "Version 1.0 Released August 2019";
+    private final static String VERSION = "Version 1.01 Released August 2019";
 
     private final static String RELEASE = "Zep - ZeptoN Echo Transcompiler\n(C) Copyright 2019 William F. Gilreath. All Rights Reserved";
     private final static String USEINFO = "Usage:  zep (option)* [ -javac (javac-options)+ ] (ZeptoN-file)+ | ( -help | -info )";
@@ -765,8 +832,9 @@ public final class Zep {
      * @param args - command-line arguments to compiler
      */
     public static void main(final String[] args) {
-
+  	    
     	System.gc();
+
     	try {
 	    	  	
 	        if (args.length == 0) {
