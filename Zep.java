@@ -6,7 +6,7 @@
  * Description: A ZeptoN transcompiler using the Java Compiler API with options not in javac.
  *
  * @author William F. Gilreath (wfgilreath@yahoo.com)
- * @version 1.0  8/15/19
+ * @version 1.01  8/16/19
  *
  * Copyright © 2019 All Rights Reserved.
  *
@@ -20,7 +20,6 @@
 
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
