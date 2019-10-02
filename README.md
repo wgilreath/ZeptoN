@@ -5,7 +5,7 @@ Compiles ZeptoN ".zep" files in to Java bytecode or ".class" files that can exec
 About
 =============================
 
-ZepC is a simpler transcompiler, it uses WEJAC https:// as its basis. I was motivated to develop ZeptoN  and the ZepC transcompiler for a tool that has fewer compiler options. I developed ZeptoN as a simpler programming language than Java that uses Java features, syntax so minimal difficulty in using ZeptoN or Java.
+ZepC is a simpler transcompiler, it uses WEJAC https://wgilreath.github.io/WEJAC/ as its basis. I was motivated to develop ZeptoN  and the ZepC transcompiler for a tool that has fewer compiler options. I developed ZeptoN as a simpler programming language than Java that uses Java features, syntax so minimal difficulty in using ZeptoN or Java.
 
 Features
 ========
