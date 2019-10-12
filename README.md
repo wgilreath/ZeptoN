@@ -16,7 +16,7 @@ Features
 * Java source code is open-source
 * Pre-built JDK11 compatible bytecode binary JAR file. [Download](https://github.com/wgilreath/ZeptoN/raw/master/ZepC.jdk11.jar)
 * Transcompiler is one Java class of approximately less than 600 lines of code
-* Licensed under the GNU General Public License (GPL) v. 3.0
+* Learn to write Java code with a program instead of class, object
 
 License
 ===============================
