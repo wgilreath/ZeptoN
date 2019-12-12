@@ -6,7 +6,7 @@
  * Description: A ZeptoN transcompiler using the Java Compiler API with options not in javac.
  *
  * @author William F. Gilreath (wfgilreath@yahoo.com)
- * @version 1.01  8/16/19
+ * @version 1.03  12/10/19
  *
  * Copyright © 2019 All Rights Reserved.
  *
@@ -48,7 +48,7 @@ public final class Zep {
      */
 	static class JavaSourceCodeStringObject extends SimpleJavaFileObject {
 
-		//source code in Java transpiled from ZeptoN
+	    //source code in Java transpiled from ZeptoN
 	    private final String code;
 
 	    /**
@@ -86,11 +86,11 @@ public final class Zep {
 	//predefined imports used in the transcompile of ZeptoN to Java source code.
     private final static String HEAD =  
 
-    	  "import java.io.*; "+
-          "import java.math.*; " +
-    	  "import java.net.*; "+
-    	  "import java.util.*; "+
-          " ";
+    	  "import java.io.*;   " +
+        "import java.math.*; " +
+    	  "import java.net.*;  " +
+    	  "import java.util.*; " +
+        " ";
     
     //predefined environment methods used in the transcompile of ZeptoN to Java source code.
     private final static String BODY =
@@ -157,7 +157,6 @@ public final class Zep {
         "private final static void println(final short param){out_str.println(param);}"+
         "private final static void println(final String param){out_str.println(param);}"+
         
-        
         "private final static void exit(final int code){run.exit(code);}"+
         "private final static long freeMemory(){return run.freeMemory();}"+
         "private final static long maxMemory(){return run.maxMemory();}"+
@@ -191,10 +190,10 @@ public final class Zep {
     private static boolean briefFlag = false;  //set brief error reporting a count of error diagnostics
     private static boolean finalFlag = false;  //set final compilation with no debug information
 
-    private static boolean echoFlag = false;  //set echo ZeptoN compiler parameters and compiler status
-    private static boolean hushFlag = false;  //set hush compiler diagnostics except errors
-    private static boolean muteFlag = false;  //set mute all compiler diagnostics are silenced
-    private static boolean timeFlag = false;  //set to time overall time to compile a ZeptoN source file
+    private static boolean echoFlag  = false;  //set echo ZeptoN compiler parameters and compiler status
+    private static boolean hushFlag  = false;  //set hush compiler diagnostics except errors
+    private static boolean muteFlag  = false;  //set mute all compiler diagnostics are silenced
+    private static boolean timeFlag  = false;  //set to time overall time to compile a ZeptoN source file
 
     private final static ArrayList<String> files = new ArrayList<>(); //Javac compiler ZeptoN source files
     private final static ArrayList<String> param = new ArrayList<>(); //Javac compiler parameters implicit and explicit
@@ -302,7 +301,7 @@ public final class Zep {
         if (echoFlag) {
 
             System.out.printf("%nZeptoN Compiler Options: %s Files: %s Encoding: %s%n%n",
-                    param.isEmpty() ? "None." : param.toString(), files.toString(), CHARSET);
+                param.isEmpty() ? "None." : param.toString(), files.toString(), CHARSET);
 
         }//end if
 
@@ -320,8 +319,8 @@ public final class Zep {
 
             JavaCompiler                       	comp = ToolProvider.getSystemJavaCompiler();
             DiagnosticCollector<JavaFileObject> diag = new DiagnosticCollector<>();
-            StandardJavaFileManager 			file = comp.getStandardFileManager(diag, LOCALE, CHARSET);
-            JavaCompiler.CompilationTask 		task = comp.getTask(SYS_ERR,
+            StandardJavaFileManager 			      file = comp.getStandardFileManager(diag, LOCALE, CHARSET);
+            JavaCompiler.CompilationTask 		    task = comp.getTask(SYS_ERR,
                     file,
                     diag,
                     param,
@@ -430,8 +429,6 @@ public final class Zep {
             }//end if
 
         }//end try
-
-        //if(statusFlag) createPackageDir(JavaSourceCodeString) //create package directory structure and move .class for -pack option??
         
     }//end compileZeptoN
 
@@ -578,7 +575,7 @@ public final class Zep {
      *
      * @param args - command line arguments passed to the ZeptoN transcompiler.
      */
-    private static void compile(final String[] args) {
+    public static void compile(final String[] args) {
 
         if (args.length == 0) {
             error(ERROR_NO_INPUT);
@@ -676,9 +673,8 @@ public final class Zep {
 
         }//end for ;;
 
-        //System.out.printf("padCommentStart()--->%n%s%n<---%n", code);
-
         return text.toString();
+
     }//end padCommentStar
 
     /**
@@ -691,8 +687,6 @@ public final class Zep {
 
         String result = padCommentStar(code);
         
-        //result = result.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "");
-
         result = result.replaceAll("//.*(?=\\n)", Zep.EMPTY_STRING); //remove single line comments
         
         return result;
@@ -717,9 +711,8 @@ public final class Zep {
 
         try {
 
-        	String zepSource = new String(Files.readAllBytes(Paths.get(fileName)), Zep.CHARSET);
+            String zepSource = new String(Files.readAllBytes(Paths.get(fileName)), Zep.CHARSET);
             
-
             zepSource = processComments(zepSource);
             
             zepSource = zepSource.replaceAll("\\{", " {");
@@ -733,9 +726,9 @@ public final class Zep {
 
             boolean hasPackageName = false;
             if (zepSource.contains("package")) {
-                int name = javaSource.indexOf("package");
-                int semi = javaSource.indexOf(";");
-                packageName = javaSource.substring(name + 8, semi);
+                int name       = javaSource.indexOf("package");
+                int semi       = javaSource.indexOf(";");
+                packageName    = javaSource.substring(name + 8, semi);
                 hasPackageName = true;
             }//end if
 
@@ -778,29 +771,29 @@ public final class Zep {
     private final static long   FILE_SIZE_MIN   = 15;     //smallest ZeptoN file size is 15-bytes
     private final static String FILE_SOURCE_EXT = ".zep"; //ZeptoN source file extension
 
-    private final static String ERROR_NO_INPUT = "No compiler options or files given! Use -help for options.";
-    private final static String ERROR_NO_FILES = "No source files given! Use -help for options.";
+    private final static String ERROR_NO_INPUT    = "No compiler options or files given! Use -help for options.";
+    private final static String ERROR_NO_FILES    = "No source files given! Use -help for options.";
 
     private final static String ERROR_PARAM_FILES = "Zep option: '%s' must precede ZeptoN source code files list.";
     private final static String ERROR_PARAM_WRONG = "Zep option: '%s' is not recognized.";
 
-    private final static String ERROR_FILE_EXTEN = "File: '%s' does not have '.zep' extension.";
-    private final static String ERROR_FILE_EXIST = "File: '%s' does not exist.";
-    private final static String ERROR_FILE_READ  = "File: '%s' is unreadable.";
-    private final static String ERROR_FILE_SMALL = "File: '%s' is too small.";
+    private final static String ERROR_FILE_EXTEN  = "File: '%s' does not have '.zep' extension.";
+    private final static String ERROR_FILE_EXIST  = "File: '%s' does not exist.";
+    private final static String ERROR_FILE_READ   = "File: '%s' is unreadable.";
+    private final static String ERROR_FILE_SMALL  = "File: '%s' is too small.";
 
-    private final static String ERROR_OPT_BRIEF = "Option -brief ambiguous with option -hush and/or -mute option.";
-    private final static String ERROR_OPT_HUSH  = "Option -hush ambiguous with option -brief and/or -mute option.";
-    private final static String ERROR_OPT_MUTE  = "Option -mute ambiguous with -brief and/or -hush option.";
+    private final static String ERROR_OPT_BRIEF   = "Option -brief ambiguous with option -hush and/or -mute option.";
+    private final static String ERROR_OPT_HUSH    = "Option -hush ambiguous with option -brief and/or -mute option.";
+    private final static String ERROR_OPT_MUTE    = "Option -mute ambiguous with -brief and/or -hush option.";
 
     private final static String LICENSE = "License is GNU General Public License (GPL) version 3.0";
-    private final static String VERSION = "Version 1.01 Released August 2019";
+    private final static String VERSION = "Version 1.03 Released December 2019";
 
     private final static String RELEASE = "Zep - ZeptoN Echo Transcompiler\n(C) Copyright 2019 William F. Gilreath. All Rights Reserved";
     private final static String USEINFO = "Usage:  zep (option)* [ -javac (javac-options)+ ] (ZeptoN-file)+ | ( -help | -info )";
 
     private final static String OPTIONS = 
-    		"                                                                        \n\r" +
+    	      "                                                                        \n\r" +
             "  ZeptoN Compiler OPTIONS:                                                \n" +
             "                                                                          \n" +
             "  Compiler Options:  [ -echo ] | [ -final ] | [ -time ]                   \n" +
@@ -840,13 +833,13 @@ public final class Zep {
 	            System.out.printf("%s %s%n%s%n", RELEASE, VERSION, LICENSE);
 	        }//end if
 	
-	        compile(args);
+	        Zep.compile(args);
 
     	} catch(Exception ex) {
     		
-            error("ZeptoN Compiler Exception: '%s' is '%s'.%n", ex.getClass().getName(), ex.getMessage());
-    		ex.printStackTrace();
-    		System.exit(EXIT_CODE_FAILURE);
+          error("ZeptoN Compiler Exception: '%s' is '%s'.%n", ex.getClass().getName(), ex.getMessage());
+    		  ex.printStackTrace();
+    		  System.exit(EXIT_CODE_FAILURE);
     	}//end try
     	
     	System.exit(EXIT_CODE_SUCCESS);
