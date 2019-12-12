@@ -8,7 +8,7 @@
  * @author William F. Gilreath (wfgilreath@yahoo.com)
  * @version 1.03  12/10/19
  *
- * Copyright © 2019 All Rights Reserved.
+ * Copyright  2019 All Rights Reserved.
  *
  * License: This software is subject to the terms of the GNU General Public License (GPL)  
  *     version 3.0 available at the following link: http://www.gnu.org/copyleft/gpl.html.
@@ -46,50 +46,50 @@ public final class Zep {
      * Java source code object as name and text as String objects. Used by the Java Compiler API 
      * to compile the transpiled ZeptoN source code in Java to a Java .class bytecode file.
      */
-	static class JavaSourceCodeStringObject extends SimpleJavaFileObject {
+    static class JavaSourceCodeStringObject extends SimpleJavaFileObject {
 
-	    //source code in Java transpiled from ZeptoN
-	    private final String code;
+        //source code in Java transpiled from ZeptoN
+        private final String code;
 
-	    /**
-	     * Constructor to create a Java source code object used by the Java Compiler API.
-	     *
-	     * @param name  - name of the Java class for the Java source code.
-	     * @param code	- code text of the Java source code.
-	     */
-	    public JavaSourceCodeStringObject(final String name, final String code) {
-	        super(URI.create("string:///" + name.replace('.','/') + Kind.SOURCE.extension), Kind.SOURCE);
-	        this.code = code;
-	    }//end constructor
+        /**
+         * Constructor to create a Java source code object used by the Java Compiler API.
+         *
+         * @param name  - name of the Java class for the Java source code.
+         * @param code  - code text of the Java source code.
+         */
+        public JavaSourceCodeStringObject(final String name, final String code) {
+            super(URI.create("string:///" + name.replace('.','/') + Kind.SOURCE.extension), Kind.SOURCE);
+            this.code = code;
+        }//end constructor
 
-	    /**
-	     * Get the source Java code as a character sequence.
-	     *
-	     * @param ignoreEncodingErrors - a boolean flag to ignore problems with the encoding of the source code.
-	     *      
-	     * @return CharSequence - the general character sequence type as an interface.
-	     */
-	    @Override
-	    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-	        return code;
-	    }//end getCharContent
+        /**
+         * Get the source Java code as a character sequence.
+         *
+         * @param ignoreEncodingErrors - a boolean flag to ignore problems with the encoding of the source code.
+         *      
+         * @return CharSequence - the general character sequence type as an interface.
+         */
+        @Override
+        public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+            return code;
+        }//end getCharContent
 
-	    /**
-	     * Get the source Java code as a Java string.
-	     *
-	     * @return String - the Java source code as a String object.
-	     */
-	    public String getCode(){ return this.code; }
-	    
-	}//end class JavaSourceCodeStringObject
-	
-	//predefined imports used in the transcompile of ZeptoN to Java source code.
+        /**
+         * Get the source Java code as a Java string.
+         *
+         * @return String - the Java source code as a String object.
+         */
+        public String getCode(){ return this.code; }
+        
+    }//end class JavaSourceCodeStringObject
+    
+    //predefined imports used in the transcompile of ZeptoN to Java source code.
     private final static String HEAD =  
 
-    	  "import java.io.*;   " +
+        "import java.io.*;   " +
         "import java.math.*; " +
-    	  "import java.net.*;  " +
-    	  "import java.util.*; " +
+        "import java.net.*;  " +
+        "import java.util.*; " +
         " ";
     
     //predefined environment methods used in the transcompile of ZeptoN to Java source code.
@@ -317,10 +317,10 @@ public final class Zep {
             Iterable<? extends JavaFileObject> list = Arrays.asList(zepSrc);
 
 
-            JavaCompiler                       	comp = ToolProvider.getSystemJavaCompiler();
+            JavaCompiler                        comp = ToolProvider.getSystemJavaCompiler();
             DiagnosticCollector<JavaFileObject> diag = new DiagnosticCollector<>();
-            StandardJavaFileManager 			      file = comp.getStandardFileManager(diag, LOCALE, CHARSET);
-            JavaCompiler.CompilationTask 		    task = comp.getTask(SYS_ERR,
+            StandardJavaFileManager             file = comp.getStandardFileManager(diag, LOCALE, CHARSET);
+            JavaCompiler.CompilationTask        task = comp.getTask(SYS_ERR,
                     file,
                     diag,
                     param,
@@ -425,7 +425,6 @@ public final class Zep {
             if (echoFlag) {
                 System.out.printf("ZeptoN Compiler result for file: '%s' is: ", fileName);
                 System.out.printf("%s%n", statusFlag ? "Success." : "Failure!");
-                //System.exit(statusFlag ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
             }//end if
 
         }//end try
@@ -703,9 +702,9 @@ public final class Zep {
 
     private static JavaSourceCodeStringObject transpile(final String fileName) {
 
-    	System.gc();
-    	
-    	String packageName = "";
+        System.gc();
+        
+        String packageName = "";
         String programName = "";
         JavaSourceCodeStringObject javaObject = null;
 
@@ -750,13 +749,13 @@ public final class Zep {
             javaCode = javaCode.replace("begin", Zep.BODY+" private "+programName+"(){} public static void main(String[] _$args){ try { init(_$args); ");
 
             if(hasPackageName) {
-            	javaObject = new JavaSourceCodeStringObject(programName, javaCode);
+                javaObject = new JavaSourceCodeStringObject(programName, javaCode);
             } else {
-            	javaObject = new JavaSourceCodeStringObject(packageName+"."+programName, javaCode);
+                javaObject = new JavaSourceCodeStringObject(packageName+"."+programName, javaCode);
             }//end if
                         
         } catch (Exception ex) {
-        	ex.printStackTrace();
+            ex.printStackTrace();
             error("Transcompile Exception: '%s' is '%s'.%n", ex.getClass().getName(), ex.getMessage());
         }//end try
 
@@ -793,7 +792,7 @@ public final class Zep {
     private final static String USEINFO = "Usage:  zep (option)* [ -javac (javac-options)+ ] (ZeptoN-file)+ | ( -help | -info )";
 
     private final static String OPTIONS = 
-    	      "                                                                        \n\r" +
+              "                                                                        \n\r" +
             "  ZeptoN Compiler OPTIONS:                                                \n" +
             "                                                                          \n" +
             "  Compiler Options:  [ -echo ] | [ -final ] | [ -time ]                   \n" +
@@ -824,26 +823,26 @@ public final class Zep {
      * @param args - command-line arguments to compiler
      */
     public static void main(final String[] args) {
-  	    
-    	System.gc();
+        
+        System.gc();
 
-    	try {
-	    	  	
-	        if (args.length == 0) {
-	            System.out.printf("%s %s%n%s%n", RELEASE, VERSION, LICENSE);
-	        }//end if
-	
-	        Zep.compile(args);
+        try {
+                
+            if (args.length == 0) {
+                System.out.printf("%s %s%n%s%n", RELEASE, VERSION, LICENSE);
+            }//end if
+    
+            Zep.compile(args);
 
-    	} catch(Exception ex) {
-    		
+        } catch(Exception ex) {
+            
           error("ZeptoN Compiler Exception: '%s' is '%s'.%n", ex.getClass().getName(), ex.getMessage());
-    		  ex.printStackTrace();
-    		  System.exit(EXIT_CODE_FAILURE);
-    	}//end try
-    	
-    	System.exit(EXIT_CODE_SUCCESS);
-    	
+              ex.printStackTrace();
+              System.exit(EXIT_CODE_FAILURE);
+        }//end try
+        
+        System.exit(EXIT_CODE_SUCCESS);
+        
     }//end main
 
 }//end class Zep
