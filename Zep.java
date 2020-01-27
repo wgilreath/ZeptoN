@@ -18,6 +18,8 @@
  *
  **/
 
+package io.github.wgilreath.ZeptoN;
+
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URI;
@@ -189,6 +191,8 @@ public final class Zep {
 
     private static boolean briefFlag = false;  //set brief error reporting a count of error diagnostics
     private static boolean finalFlag = false;  //set final compilation with no debug information
+    private static boolean panicFlag = false;  //set panic on error and exit immediately
+
 
     private static boolean echoFlag  = false;  //set echo ZeptoN compiler parameters and compiler status
     private static boolean hushFlag  = false;  //set hush compiler diagnostics except errors
@@ -204,6 +208,11 @@ public final class Zep {
     private final static Locale  LOCALE       = Locale.getDefault();
     private final static Writer  SYS_ERR      = new PrintWriter(System.err, true);
     private final static String  EMPTY_STRING = "";
+
+    private final static String  JAVAC_DIR    = "-d";
+    private final static String  JAVAC_DEBUG  = "-g";
+    private final static String  JAVAC_FINAL  = "-g:none";
+    private final static String  HOME_DIR     = System.getProperty("user.dir");
 
     private final static Iterable<String> NO_ANNOTATION_PROC = Collections.emptyList();
 
@@ -321,12 +330,11 @@ public final class Zep {
             DiagnosticCollector<JavaFileObject> diag = new DiagnosticCollector<>();
             StandardJavaFileManager             file = comp.getStandardFileManager(diag, LOCALE, CHARSET);
             JavaCompiler.CompilationTask        task = comp.getTask(SYS_ERR,
-                    file,
-                    diag,
-                    param,
-                    NO_ANNOTATION_PROC,
-                    list);
-
+                                                file,
+                                                diag,
+                                                param,
+                                                NO_ANNOTATION_PROC,
+                                                list);
             System.gc();
 
             timeStart  = System.currentTimeMillis();
@@ -442,7 +450,7 @@ public final class Zep {
         System.out.printf("%nError! ");
         System.out.printf(text, args);
         System.out.printf("%n%n");
-        System.exit(EXIT_CODE_PROBLEM);
+        if(panicFlag) System.exit(EXIT_CODE_PROBLEM);
 
     }//end error
 
@@ -514,6 +522,9 @@ public final class Zep {
                     case "-final":
                         finalFlag = true;
                         break;
+                    case "-panic":
+                        panicFlag = true;
+                        break;
                     case "-brief":
                         if (hushFlag || muteFlag)
                             error(ERROR_OPT_BRIEF);
@@ -535,6 +546,7 @@ public final class Zep {
                     case "-help":
                         printOptions();
                         break;
+                    case "-ver" :
                     case "-info":
                         printVersion();
                         break;
@@ -596,9 +608,6 @@ public final class Zep {
 
     }//end compile
 
-    private final static String JAVAC_FINAL = "-g:none";
-    private final static String JAVAC_DEBUG = "-g";
-
     /**
      * Configure underlying Javac compiler parameters the WEJAC parameters passed as command line arguments.
      */
@@ -607,6 +616,11 @@ public final class Zep {
         for (String sourceFile : files) {
             verifyFile(sourceFile);
         }//end for
+
+        //set Javac param -d to specify cwd as output directory
+        //auto-magically create package path
+        param.add(Zep.JAVAC_DIR);
+        param.add(Zep.HOME_DIR);
 
         param.add(finalFlag ? JAVAC_FINAL : JAVAC_DEBUG);
                 
@@ -652,8 +666,6 @@ public final class Zep {
             head = code.indexOf("/*", head);
 
             tail = code.indexOf("*/", head + 2);
-
-            //System.out.printf("padCommentStar() head:%d tail%d%n", head, tail);
 
             if (head == -1) {
                 break;
@@ -704,8 +716,8 @@ public final class Zep {
 
         System.gc();
         
-        String packageName = "";
-        String programName = "";
+        String packageName = EMPTY_STRING;
+        String programName = EMPTY_STRING;
         JavaSourceCodeStringObject javaObject = null;
 
         try {
@@ -732,7 +744,7 @@ public final class Zep {
             }//end if
 
             int progIdent = javaSource.indexOf("prog");
-                        
+
             int openBrace = javaSource.indexOf("{");
             
             programName = javaSource.substring(progIdent + 5, openBrace - 1);
@@ -786,7 +798,7 @@ public final class Zep {
     private final static String ERROR_OPT_MUTE    = "Option -mute ambiguous with -brief and/or -hush option.";
 
     private final static String LICENSE = "License is GNU General Public License (GPL) version 3.0";
-    private final static String VERSION = "Version 1.03 Released December 2019";
+    private final static String VERSION = "Version 1.04 Released December 2019";
 
     private final static String RELEASE = "Zep - ZeptoN Echo Transcompiler\n(C) Copyright 2019 William F. Gilreath. All Rights Reserved";
     private final static String USEINFO = "Usage:  zep (option)* [ -javac (javac-options)+ ] (ZeptoN-file)+ | ( -help | -info )";
@@ -802,14 +814,15 @@ public final class Zep {
             "    -time        Print total time for success compiling of a source file. \n" +
             "                                                                          \n" +
 
-            "  Error Reporting Option: [ -brief | -hush | -mute ]                      \n" +
+            "  Error Reporting Option: [ -brief | -hush | -mute ] | [ -panic ]         \n" +
             "                                                                          \n" +
             "    -brief       Print only a brief count of compiler messages.           \n" +
             "    -hush        Disable all compiler messages except errors.             \n" +
             "    -mute        Disable all compiler messages.                           \n" +
+            "    -panic       Exit and terminate compiler upon an error.               \n" +
             "                                                                          \n" +
 
-            "  Help or Version Option:  ( -help | -? ) | ( -info | -v )                \n" +
+            "  Help or Version Option:  ( -help | -? | -info | -ver )                  \n" +
             "                                                                          \n" +
             "    -help        Print list of compiler options and exit.                 \n" +
             "    -info        Print compiler version information and exit.             \n" +
@@ -836,7 +849,7 @@ public final class Zep {
 
         } catch(Exception ex) {
             
-          error("ZeptoN Compiler Exception: '%s' is '%s'.%n", ex.getClass().getName(), ex.getMessage());
+              error("ZeptoN Compiler Exception: '%s' is '%s'.%n", ex.getClass().getName(), ex.getMessage());
               ex.printStackTrace();
               System.exit(EXIT_CODE_FAILURE);
         }//end try
