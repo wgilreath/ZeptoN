@@ -14,7 +14,7 @@ Features
 * Java cross-platform bytecode for (macOS/Linux/Windows) 
 * Uses underlying Java compiler through Java Compiler API
 * Java source code is open-source
-* Pre-built JDK11 compatible bytecode binary JAR file for version 1.0. [Download](https://github.com/wgilreath/ZeptoN/raw/master/ZepC.jdk11.jar)
+* Pre-built JDK8 compatible bytecode binary JAR file for version 1.0.3. [Download](https://github.com/wgilreath/ZeptoN/raw/master/ZepC.jdk8.jar)
 * Transcompiler is one Java class of approximately less than 900 lines of code (including comments)
 * Learn to write Java code with a program instead of class, object
 
